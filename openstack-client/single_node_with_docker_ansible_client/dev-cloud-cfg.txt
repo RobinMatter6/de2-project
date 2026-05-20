@@ -1,0 +1,14 @@
+#cloud-config
+
+users:
+  - name: appuser
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    groups: sudo
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDuskgWE1yYq93MgMhmCroFdvhyuETxwa9neU37RK/lG+59amaAOekOx1oY5arqGdo3DUjQHkOIfB9v+zm+TdTInKwFxJLvZ0h5rbIXwq11JTQZciMV8zS+7pNf8NNhzzAUjXtLB9vsT0HjK7EfhenjRHy7ms7Fj5ywDSexZFTBxutgO6teI7UCn6vo1ONY34c8oJdNhnvgJ1EbcyExjw0KENh2uq5l0/cEFjyMo9ivwjfu92cbJo5TKTM2eqxyOJ8pWTg//QnofSszFPmeJLmA66357LKFfnuYAV5LbLr8dfppEMNiCsJp5LA1ioXiFAx1y+fezGT7NySVOdivznTYan62eGkE67LzBduX14LucYJYzwwWcScSvfMmUM7p4i+BuN0OFPRLRfoKsasz2kQc2n8w/AkAeP99bkENSI+w7cD7X3677A1IvdKw8n1/plEs/n8QE7dVaz5WUKhQLbwrsS6S+TcTVkqa4CcqRil1su+2uCtCV/pydn+RHnSIEUk= ubuntu@de2-group6-client
+
+packages:
+  - python3
+  - python3-pip
+  - python3-apt
