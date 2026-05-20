@@ -102,11 +102,11 @@
      apt: pkg=docker-ce state=present update_cache=true allow_unauthenticated=yes
      become: true
 
-   - name: Running containers
-     become: true
-     shell: docker compose up -d 
-     args: 
-       chdir: /home/appuser/de-2-project 
+  #  - name: Running containers
+  #    become: true
+  #    shell: docker compose up -d 
+  #    args: 
+  #      chdir: /home/appuser/de-2-project 
 
 - hosts: devserver
   
@@ -118,7 +118,6 @@
      apt: pkg=python3-pip state=latest update_cache=true  
      become: true
 
-   # This forces the terminal engine environment mapping to refresh tracking paths
    - name: Flush paths for pip installation tracking
      meta: flush_handlers
 
@@ -132,4 +131,3 @@
          - "numpy"
          - "requests"
          - "pygithub"
-       extra_args: --break-system-packages
