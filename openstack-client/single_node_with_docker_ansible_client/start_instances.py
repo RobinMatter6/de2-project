@@ -1,6 +1,7 @@
 # http://docs.openstack.org/developer/python-novaclient/ref/v2/servers.html
 import time, os, sys, random, re
 from os import environ as env
+from github import Github
 
 from  novaclient import client
 import keystoneclient.v3.client as ksclient
@@ -54,6 +55,13 @@ else:
 
 secgroups = ['default']
 
+# Check for already running instances before creating new ones
+existing = nova.servers.list()
+for server in existing:
+    if "group6_prod_server" in server.name or "group6_dev_server" in server.name:
+        print(f"Instance '{server.name}' already exists. Delete existing instances before running this script.")
+        sys.exit(1)
+
 print ("Creating instances ... ")
 instance_prod = nova.servers.create(name="group6_prod_server_with_docker_"+str(identifier), image=image, flavor=flavor, key_name=None,userdata=userdata_prod, nics=nics,security_groups=secgroups)
 instance_dev = nova.servers.create(name="group6_dev_server_"+str(identifier), image=image, flavor=flavor, key_name=None,userdata=userdata_dev, nics=nics,security_groups=secgroups)
@@ -103,3 +111,13 @@ with open("hosts", "w") as f:
     f.write(hosts_content)
 
 print("Ansible hosts file updated automatically with new IPs!")
+
+# Update GitHub secret so Actions can SSH into the new prod server
+github_token = env.get('GITHUB_TOKEN')
+if github_token:
+    g = Github(github_token)
+    repo = g.get_repo("leegilligana/de2-project")
+    repo.create_secret("PROD_HOST", ip_address_prod)
+    print(f"GitHub secret PROD_HOST updated to {ip_address_prod}")
+else:
+    print(f"GITHUB_TOKEN not set. Please manually update GitHub secret PROD_HOST to {ip_address_prod}")
