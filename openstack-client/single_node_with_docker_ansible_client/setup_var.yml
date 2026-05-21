@@ -1,2 +1,9 @@
-prod_home: /technical-training/model-serving/ci_cd/production_server
-dev_home: /technical-training/model-serving/ci_cd/development_server
+# Git
+repo_url: "git@github.com:leegilligana/de2-project.git"
+repo_dest: "/home/appuser/de-2-project"
+repo_branch: "main"
+
+# Auth
+deploy_key_dir: "/home/ubuntu/cluster-keys"
+cluster_keys_dir: "/home/appuser/cluster-keys"
+

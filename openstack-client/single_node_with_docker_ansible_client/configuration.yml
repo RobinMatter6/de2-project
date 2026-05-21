@@ -1,5 +1,7 @@
 - hosts: all
-  
+  vars_files:
+   - setup_var.yml 
+
   tasks:
    - name: Generate hosts file
      lineinfile: 
@@ -18,7 +20,7 @@
    - name: Ensure cluster-keys directory exists
      become: false
      file:
-       path: /home/appuser/cluster-keys
+       path: "{{ cluster_keys_dir }}"
        state: directory
        mode: '0755'
        owner: appuser
@@ -27,27 +29,19 @@
    - name: Copy deploy private key to target server
      become: false
      copy:
-      src: /home/ubuntu/cluster-keys/deploy-key 
-      dest: /home/appuser/cluster-keys/deploy-key 
+      src: "{{ deploy_key_dir }}/deploy-key"
+      dest: "{{ cluster_keys_dir }}/deploy-key"
       mode: '0600'
 
    - name: Download git repository
      become: false
      git:
-       repo: "git@github.com:leegilligana/de2-project.git"
-       dest: /home/appuser/de-2-project
-       version: main
-       key_file: /home/appuser/cluster-keys/deploy-key
+       repo: "{{ repo_url }}"
+       dest: "{{ repo_dest }}"
+       version: "{{ repo_branch }}"
+       key_file: "{{ cluster_keys_dir }}/deploy-key"
        accept_hostkey: yes
       
-   - name: Change ownership of a directory
-     become: true
-     file:
-       path: /home/appuser/de-2-project
-       state: directory
-       recurse: yes
-       owner: appuser
-       group: appuser
 
 - hosts: prodserver
  
@@ -74,8 +68,10 @@
        state: present
      become: true
 
-   - name: Add Docker repository 
-     command: add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
+   - name: Add Docker repository
+     apt_repository:
+       repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
+       state: present
      become: true
 
    - name: apt update
@@ -106,7 +102,7 @@
   #    become: true
   #    shell: docker compose up -d 
   #    args: 
-  #      chdir: /home/appuser/de-2-project 
+  #      chdir: {{ repo_dest }}
 
 - hosts: devserver
   
