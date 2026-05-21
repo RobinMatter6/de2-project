@@ -71,7 +71,6 @@ if top_repos_raw:
     
     df_repos.to_csv('top_1000_github_repos.csv', index=False)
     print("\n Data successfully saved to top_1000_github_repos.csv")
-    display(df_repos.head())
 
 # %%
 import re
@@ -128,6 +127,5 @@ df_repos.to_csv('top_1000_github_repos_with_commits.csv', index=False)
 
 print("\n Feature extraction completed successfully. Data saved to top_1000_github_repos_with_commits.csv")
 
-display(df_repos.head())
 
 
