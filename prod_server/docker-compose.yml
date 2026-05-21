@@ -12,7 +12,8 @@ services:
     ports:
       - "5100:5100"
     depends_on:
-      - rabbit
+      rabbit:
+        condition: service_healthy
   rabbit:
     hostname: rabbit
     image: rabbitmq:3.13-management
@@ -22,6 +23,11 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
   worker_1:
     build:
       context: .
@@ -36,4 +42,5 @@ services:
     links:
       - rabbit
     depends_on:
-      - rabbit
+      rabbit:
+        condition: service_healthy
