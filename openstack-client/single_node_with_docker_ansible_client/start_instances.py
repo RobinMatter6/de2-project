@@ -1,6 +1,5 @@
 # http://docs.openstack.org/developer/python-novaclient/ref/v2/servers.html
 import time, os, sys, random, re
-import inspect
 from os import environ as env
 
 from  novaclient import client
@@ -41,8 +40,6 @@ if private_net != None:
 else:
     sys.exit("private-net not defined.")
 
-#print("Path at terminal when executing this file")
-#print(os.getcwd() + "\n")
 cfg_file_path =  os.getcwd()+'/prod-cloud-cfg.txt'
 if os.path.isfile(cfg_file_path):
     userdata_prod = open(cfg_file_path)

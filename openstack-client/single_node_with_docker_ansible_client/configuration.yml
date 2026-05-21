@@ -13,6 +13,7 @@
      with_items: "{{groups['all']}}"
      become: true
 
+
    - name: apt update
      apt: update_cache=yes upgrade=dist
      become: true
@@ -56,6 +57,7 @@
       - ca-certificates
       - curl
       - software-properties-common
+      - docker-compose-plugin
      become: true  
 
    - name: apt update
@@ -98,11 +100,11 @@
      apt: pkg=docker-ce state=present update_cache=true allow_unauthenticated=yes
      become: true
 
-  #  - name: Running containers
-  #    become: true
-  #    shell: docker compose up -d 
-  #    args: 
-  #      chdir: {{ repo_dest }}
+   - name: running containers
+     become: true
+     shell: docker compose up -d 
+     args: 
+       chdir: "{{ repo_dest }}/prod_server"
 
 - hosts: devserver
   
