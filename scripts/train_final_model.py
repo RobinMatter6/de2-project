@@ -33,7 +33,7 @@ final_model = Pipeline([
 print("Training final Random Forest production model...")
 final_model.fit(X, y_log)
 
-# 6. Save Everything
+# Save Everything
 joblib.dump(final_model, 'star_predictor_model.pkl')
 joblib.dump(top_languages, 'top_languages.pkl')
 joblib.dump(X.columns.tolist(), 'model_columns.pkl')
