@@ -6,7 +6,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestRegressor
 
 # Load Data
-df = pd.read_csv('top_1000_github_repos_with_commits_v2.csv')
+df = pd.read_csv('../data/model_train_data.csv')
 
 # Fix Boolean Columns
 bool_columns = ['has_wiki', 'has_pages', 'has_discussions', 'archived']
