@@ -7,7 +7,11 @@ from sklearn.svm import SVR
 from sklearn.model_selection import GridSearchCV, KFold
 
 # Load Data
-df = pd.read_csv('../data/top_1000_github_repos_with_commits.csv')
+df = pd.read_csv('../data/top_1000_github_repos_with_commits_v2.csv')
+
+# Convert boolean features into numerical
+bool_columns = ['has_wiki', 'has_pages', 'has_discussions', 'archived']
+df[bool_columns] = df[bool_columns].astype(int)
 
 # Handle the 'language' feature
 TOP_N = 5
@@ -17,7 +21,7 @@ df['language'] = df['language'].apply(lambda x: x if x in top_languages else 'Ot
 df_encoded = pd.get_dummies(df, columns=['language'], drop_first=False)
 
 # Split dataset into features and target, use log scale for y for power law
-X = df_encoded.drop(['repo_name', 'url', 'stars', 'watchers'], axis=1)
+X = df_encoded.drop(['repo_name', 'stars'], axis=1)
 y_log = np.log1p(df_encoded['stars'])
 
 # Build the nested Pipeline
