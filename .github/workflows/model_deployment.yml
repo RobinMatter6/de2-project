@@ -1,0 +1,23 @@
+name: Deploy model to production
+
+on:
+  push:
+    branches:
+      - production
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - name: Deploy to prod server
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.PROD_HOST }}
+          username: appuser
+          key: ${{ secrets.PROD_SSH_KEY }}
+          script: |
+            cd /home/appuser/de-2-project
+            git pull origin production
+            cp dev_server/model.weights.h5 prod_server/model.weights.h5
+            cp dev_server/model.json prod_server/model.json
+            sudo docker compose -f prod_server/docker-compose.yml restart web worker_1
