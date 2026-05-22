@@ -1,1 +1,11 @@
 openstack-client/single_node_with_docker_ansible_client/token.txt
+
+# Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+credentials.json
+.secrets/
