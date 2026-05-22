@@ -21,6 +21,20 @@ Contextualize using ansible with:
 ansible-playbook configuration.yml --private-key=/home/ubuntu/cluster-keys/cluster-key
 ```
 
+## GitHub Actions Runner
+
+Register a self-hosted runner. Get a fresh token from https://github.com/RobinMatter6/de2-project/settings/actions/runners/new:
+
+```
+./scripts/setup-runner.sh <REGISTRATION_TOKEN>
+```
+
+To remove the runner, get the token by clicking remove runner at https://github.com/RobinMatter6/de2-project/settings/actions/runners:
+
+```
+./scripts/teardown-runner.sh <REMOVAL_TOKEN>
+```
+
 ## Git Hook
 
 To activate the pre commit hook that scans staged changes for accidentally committed secrets. run once:
