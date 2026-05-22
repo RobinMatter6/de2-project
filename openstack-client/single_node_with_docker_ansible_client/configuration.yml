@@ -49,19 +49,14 @@
   vars_files:
    - setup_var.yml  
   
-  tasks:  
+  tasks:
    - name: Extra packages
-     apt: pkg={{item}} state=latest update_cache=true 
+     apt: pkg={{item}} state=latest update_cache=true
      with_items:
       - apt-transport-https
       - ca-certificates
       - curl
       - software-properties-common
-      - docker-compose-plugin
-     become: true  
-
-   - name: apt update
-     apt: update_cache=yes upgrade=dist
      become: true
 
    - name: Add Docker repository key
@@ -79,7 +74,7 @@
    - name: apt update
      apt: update_cache=yes upgrade=dist
      become: true
-  
+
    # Workaround pip issue with MTU mismatch
    - name: Create Ansible docker config directory.
      become: true
@@ -96,8 +91,11 @@
            "mtu": 1450
          }
 
-   - name: Install Docker  
-     apt: pkg=docker-ce state=present update_cache=true allow_unauthenticated=yes
+   - name: Install Docker and Docker Compose plugin
+     apt: pkg={{item}} state=present update_cache=true allow_unauthenticated=yes
+     with_items:
+      - docker-ce
+      - docker-compose-plugin
      become: true
 
    - name: running containers
@@ -127,5 +125,6 @@
          - "torch"
          - "scikit-learn"
          - "numpy"
+         - "pandas"
          - "requests"
          - "pygithub"
