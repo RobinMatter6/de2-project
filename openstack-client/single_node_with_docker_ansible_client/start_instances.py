@@ -116,7 +116,7 @@ print("Ansible hosts file updated automatically with new IPs!")
 github_token = env.get('GITHUB_TOKEN')
 if github_token:
     g = Github(github_token)
-    repo = g.get_repo("leegilligana/de2-project")
+    repo = g.get_repo("RobinMatter6/de2-project")
     repo.create_secret("PROD_HOST", ip_address_prod)
     print(f"GitHub secret PROD_HOST updated to {ip_address_prod}")
 else:
