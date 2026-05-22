@@ -20,3 +20,18 @@ Contextualize using ansible with:
 ```
 ansible-playbook configuration.yml --private-key=/home/ubuntu/cluster-keys/cluster-key
 ```
+
+## Git Hook
+
+To activate the pre commit hook that scans staged changes for accidentally committed secrets. run once:
+
+```
+pip install pre-commit detect-secrets
+pre-commit install
+```
+
+To re-scan the whole repo manually:
+
+```
+pre-commit run --all-files
+```
