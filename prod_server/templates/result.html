@@ -5,23 +5,36 @@
 </head>
 <body>
 
-<h1>Accuracy is {{accuracy}}</h1>
+<h1>Repository Star Rankings</h1>
+
 <table BORDER=1>
 <thead>
 <tr>
-<th>True</th><th>Predicted</th>
+<th>Repository</th><th>Actual Stars</th><th>Predicted Stars</th>
 </tr>
 </thead>
 <tbody>
-<tr>
-{% for val in range(7) %}
 
-<td>{{final_results['y'][val]}}</td><td>{{final_results['predicted'][val]}}</td> 
+{% for repo in final_results %}
+<tr>
+    <td>{{ repo.repo_name }}</td>
+    <td>{{ repo.actual_stars }}</td>
+    <td>{{ repo.predicted_stars }}</td>
 </tr>
 {% endfor %}
+
 </tbody>
 </table>
 
+<br><br>
+<div style="display: flex; gap: 10px;">
+    <form action="/" method="GET">
+        <button type="submit">Front Page</button>
+    </form>
 
+    <form action="/predictions" method="GET">
+        <button type="submit">Run Another Test</button>
+    </form>
+</div>
 </body>
 </html>

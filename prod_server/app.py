@@ -1,10 +1,10 @@
-from workerA import get_accuracy, get_predictions
+from workerA import predict_and_rank_repos
 
 from flask import (
    Flask,
    request,
    jsonify,
-   render_template 
+   render_template
 )
 
 #app = Flask(__name__, template_folder='./templates',static_folder='./static')
@@ -12,35 +12,25 @@ app = Flask(__name__)
 
 @app.route("/")
 def index():
-    return '<h1>Group6</h1>'
-
-@app.route("/accuracy", methods=['POST', 'GET'])
-def accuracy():
-    if request.method == 'POST':
-        r = get_accuracy.delay()
-        a = r.get()
-        return '<h1>The accuracy is {}</h1>'.format(a)
-
-    return '''<form method="POST">
-    <input type="submit">
-    </form>'''
-
+    return '''
+        <h1>Group6</h1>
+        <br>
+        <form action="/predictions" method="GET">
+                <button type="submit">Go to Predictions</button>
+        </form>
+        '''
 @app.route("/predictions", methods=['POST', 'GET'])
 def predictions():
     if request.method == 'POST':
-        results = get_predictions.delay()
-        predictions = results.get()
+        task = predict_and_rank_repos.delay()
 
-        results = get_accuracy.delay()
-        accuracy = results.get()
-        
-        final_results = predictions
+        final_results = task.get()
 
-        return render_template('result.html', accuracy=accuracy ,final_results=final_results) 
-                    
+        return render_template('result.html', final_results=final_results)
+
     return '''<form method="POST">
-    <input type="submit">
+    <input type="submit" value="Predict & Rank">
     </form>'''
 
 if __name__ == '__main__':
-    app.run(host = '0.0.0.0',port=5100,debug=True)
+    app.run(host = '0.0.0.0',port=5100,debug=True, threaded=False)
