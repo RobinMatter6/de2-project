@@ -15,7 +15,7 @@ jobs:
         with:
           host: ${{ secrets.PROD_HOST }}
           username: appuser
-          key: ${{ secrets.PROD_SSH_KEY }}
+          key_path: /home/ubuntu/cluster-keys/cluster-key
           script: |
             cd /home/appuser/de-2-project
             git pull origin production
