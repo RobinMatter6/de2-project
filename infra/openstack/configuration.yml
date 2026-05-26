@@ -98,10 +98,17 @@
       - docker-compose-plugin
      become: true
 
-   - name: running containers
+   - name: Add appuser to docker group
+     user:
+       name: appuser
+       groups: docker
+       append: yes
      become: true
-     shell: docker compose up -d 
-     args: 
+
+   - name: running containers
+     become: false
+     shell: docker compose up -d
+     args:
        chdir: "{{ repo_dest }}/prod_server"
 
 - hosts: devserver
