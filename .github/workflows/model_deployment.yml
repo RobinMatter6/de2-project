@@ -21,4 +21,4 @@ jobs:
             cp dev_server/model_columns.pkl prod_server/model_columns.pkl
             cp dev_server/star_predictor_model.pkl prod_server/star_predictor_model.pkl
             cp dev_server/top_languages.pkl prod_server/top_languages.pkl
-            sudo docker compose -f prod_server/docker-compose.yml restart web worker_1
+            sudo docker compose -f prod_server/docker-compose.yml up -d --build
