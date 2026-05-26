@@ -3,12 +3,12 @@
 ## Start and Contextualize Dev and Prod VMs
 Load OpenStack credentials. You will need your Swedish Science Cloud username and API password for this step:
 ```
-source UPPMAX\ 2026_1-24-openrc
+source infra/openstack/openrc.sh
 ```
 
 Next, start the VMs with:
 ```
-python3 openstack-client/single_node_with_docker_ansible_client/start_instances.py
+python3 infra/openstack/start_instances.py
 ```
 
 You can ssh into them with:
@@ -26,13 +26,13 @@ ansible-playbook configuration.yml --private-key=/home/ubuntu/cluster-keys/clust
 Register a self-hosted runner. Get a fresh token from https://github.com/RobinMatter6/de2-project/settings/actions/runners/new:
 
 ```
-./scripts/setup-runner.sh <REGISTRATION_TOKEN>
+./infra/actions_runner/setup-runner.sh <REGISTRATION_TOKEN>
 ```
 
 To remove the runner, get the token by clicking remove runner at https://github.com/RobinMatter6/de2-project/settings/actions/runners:
 
 ```
-./scripts/teardown-runner.sh <REMOVAL_TOKEN>
+./infra/actions_runner/teardown-runner.sh <REMOVAL_TOKEN>
 ```
 
 ## Git Hook
