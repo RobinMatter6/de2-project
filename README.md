@@ -35,6 +35,22 @@ To remove the runner, get the token by clicking remove runner at https://github.
 ./infra/actions_runner/teardown-runner.sh <REMOVAL_TOKEN>
 ```
 
+## Deploy to Production
+
+Train the model and commit the artifacts, then push main to the production branch to trigger the CI/CD pipeline:
+
+```bash
+cd dev_server
+python3 train_final_model.py
+cd ..
+git add dev_server/star_predictor_model.pkl dev_server/top_languages.pkl dev_server/model_columns.pkl
+git commit -m "Push new model to production"
+git push origin main
+git push origin main:production --force
+```
+
+The GitHub Actions workflow will SSH into the prod server, copy the model files, and restart the Docker services.
+
 ## Git Hook
 
 To activate the pre commit hook that scans staged changes for accidentally committed secrets. run once:
