@@ -47,7 +47,7 @@ def get_top_repositories(min_stars=50, total_needed=1000):
             page += 1
             time.sleep(1) # Rate‑limit–compliant anti‑ban throttling
         else:
-            print(f"❌ Request error: {response.status_code}")
+            print(f" Request error: {response.status_code}")
             print(response.json())
             break
             
@@ -69,7 +69,7 @@ if top_repos_raw:
     
     df_repos = pd.DataFrame(repo_data_list)
     
-    df_repos.to_csv('top_1000_github_repos.csv', index=False)
+    df_repos.to_csv('../../data/raw/top_1000_github_repos.csv', index=False)
     print("\n Data successfully saved to top_1000_github_repos.csv")
 
 # %%
@@ -123,7 +123,7 @@ for index, row in df_repos.iterrows():
 df_repos['commits'] = commits_list
 
 # Save as the final CSV containing the commits.
-df_repos.to_csv('top_1000_github_repos_with_commits.csv', index=False)
+df_repos.to_csv('../../data/raw/top_1000_github_repos_with_commits.csv', index=False)
 
 print("\n Feature extraction completed successfully. Data saved to top_1000_github_repos_with_commits.csv")
 

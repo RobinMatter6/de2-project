@@ -1,55 +1,56 @@
-import numpy as np
 import pandas as pd
+import numpy as np
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.compose import TransformedTargetRegressor
+from sklearn.svm import SVR
 from sklearn.model_selection import GridSearchCV, KFold
 
-# Load data
-df = pd.read_csv('../data/top_1000_github_repos_with_commits_v2.csv')
+# Load Data
+df = pd.read_csv('../../data/raw/top_1000_github_repos_with_commits_v2.csv')
 
 # Convert boolean features into numerical
 bool_columns = ['has_wiki', 'has_pages', 'has_discussions', 'archived']
 df[bool_columns] = df[bool_columns].astype(int)
 
-# 2. Handle the 'language' feature
+# Handle the 'language' feature
 TOP_N = 5
 top_languages = df['language'].value_counts().nlargest(TOP_N).index.tolist()
 df['language'] = df['language'].fillna('Other')
 df['language'] = df['language'].apply(lambda x: x if x in top_languages else 'Other')
 df_encoded = pd.get_dummies(df, columns=['language'], drop_first=False)
 
-# Split data into features and target
+# Split dataset into features and target, use log scale for y for power law
 X = df_encoded.drop(['repo_name', 'stars'], axis=1)
 y_log = np.log1p(df_encoded['stars'])
 
-# Create pipeline
+# Build the nested Pipeline
 pipeline = Pipeline([
-	('scaler', StandardScaler()),
-	('model', RandomForestRegressor(random_state=42))
+    ('scaler', StandardScaler()),
+    ('model', SVR())
 ])
 
-
-# GridSearch parameters
+# Setup GridSearch Hyperparameters
 param_grid = {
-	'model__n_estimators':[100, 200],
-	'model__max_depth': [10, 20, None]
+    'model__C': [0.1, 1.0, 10.0],
+    'model__kernel': ['linear', 'rbf']
 }
 
-# Shuffle the data for the cross-validation
+# Make sure to shuffle data for cv
 cv_strategy = KFold(n_splits=5, shuffle=True, random_state=42)
 
-# Train and evaluate
+
+# Train and Evaluate
 grid = GridSearchCV(
-	estimator=pipeline,
-	param_grid=param_grid,
-	cv=cv_strategy,
-	scoring='r2',
-	n_jobs=-1
+    estimator=pipeline,
+    param_grid=param_grid,
+    cv=cv_strategy,
+    scoring='r2',
+    n_jobs=-1
 )
 
-print("--- Random Forest Tuning ---")
-print("Starting model training...")
+print("--- Support Vector Regression (SVR) Tuning ---")
+print("Training models... (This may take a few minutes)")
 grid.fit(X, y_log)
 
 print(f"Best Parameters: {grid.best_params_}")

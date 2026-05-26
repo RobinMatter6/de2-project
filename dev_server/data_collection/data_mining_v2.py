@@ -22,7 +22,7 @@ HEADERS = {
 print("Token configured and request headers are ready")
 
 # Ensure the data directory exists (assuming script is run from scripts/ folder)
-DATA_DIR = '../data'
+DATA_DIR = '../../data/raw'
 os.makedirs(DATA_DIR, exist_ok=True)
 
 # %%

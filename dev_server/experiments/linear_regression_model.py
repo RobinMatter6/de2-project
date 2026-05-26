@@ -6,7 +6,7 @@ from sklearn.pipeline import Pipeline
 import pandas as pd
 import numpy as np
 # read datafile
-df = pd.read_csv('../data/top_1000_github_repos_with_commits_v2.csv')
+df = pd.read_csv('../../data/raw/top_1000_github_repos_with_commits_v2.csv')
 
 # Convert boolean features into numerical
 bool_columns = ['has_wiki', 'has_pages', 'has_discussions', 'archived']

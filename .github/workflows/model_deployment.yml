@@ -18,6 +18,7 @@ jobs:
           script: |
             cd /home/appuser/de-2-project
             git pull origin production
-            cp dev_server/model.weights.h5 prod_server/model.weights.h5
-            cp dev_server/model.json prod_server/model.json
+            cp dev_server/model_columns.pkl prod_server/model_columns.pkl
+            cp dev_server/star_predictor_model.pkl prod_server/star_predictor_model.pkl
+            cp dev_server/top_languages.pkl prod_server/top_languages.pkl
             sudo docker compose -f prod_server/docker-compose.yml restart web worker_1

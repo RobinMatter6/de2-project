@@ -1,4 +1,8 @@
-openstack-client/single_node_with_docker_ansible_client/token.txt
+infra/openstack/token.txt
+
+# Python
+__pycache__/
+*.pyc
 
 # Secrets
 .env

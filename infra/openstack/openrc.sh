@@ -10,7 +10,6 @@
 # OpenStack API is version 3. For example, your cloud provider may implement
 # Image API v1.1, Block Storage API v2, and Compute API v2.0. OS_AUTH_URL is
 # only for the Identity API served through keystone.
-source "UPPMAX 2026_1-24-openrc.sh"
 export OS_AUTH_URL=https://east-1.cloud.snic.se:5000
 # With the addition of Keystone we have standardized on the term **project**
 # as the entity that owns the resources.
