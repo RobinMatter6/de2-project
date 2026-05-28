@@ -1,3 +1,4 @@
+import time
 import numpy as np
 import pandas as pd
 from sklearn.pipeline import Pipeline
@@ -50,7 +51,13 @@ grid = GridSearchCV(
 
 print("--- Random Forest Tuning ---")
 print("Starting model training...")
+
+start_time = time.time()
 grid.fit(X, y_log)
+end_time = time.time()
+
+execution_time = end_time - start_time
 
 print(f"Best Parameters: {grid.best_params_}")
 print(f"Best CV R-squared: {grid.best_score_:.4f}")
+print(f"Total Training Time: {execution_time:.2f} seconds")
