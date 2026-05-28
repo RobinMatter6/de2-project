@@ -51,53 +51,93 @@ cfg_file_path =  os.getcwd()+'/dev-cloud-cfg.txt'
 if os.path.isfile(cfg_file_path):
     userdata_dev = open(cfg_file_path)
 else:
-    sys.exit("dev-cloud-cfg.txt is not in current working directory")    
+    sys.exit("dev-cloud-cfg.txt is not in current working directory")
+
+# Workers reuse the same base cloud config as the dev server
+cfg_file_path = os.getcwd()+'/dev-cloud-cfg.txt'
+userdata_worker1 = open(cfg_file_path)
+userdata_worker2 = open(cfg_file_path)
 
 secgroups = ['default']
 
-# Check for already running instances before creating new ones
+def get_ip(instance):
+    for network in instance.networks[private_net]:
+        if re.match(r'\d+\.\d+\.\d+\.\d+', network):
+            return network
+    raise RuntimeError(f'No IP address assigned to {instance.name}!')
+
+# Find any already-running group6 instances
 existing = nova.servers.list()
-for server in existing:
-    if "group6_prod_server" in server.name or "group6_dev_server" in server.name:
-        print(f"Instance '{server.name}' already exists. Delete existing instances before running this script.")
-        sys.exit(1)
+existing_prod  = next((s for s in existing if "group6_prod_server"  in s.name), None)
+existing_dev   = next((s for s in existing if "group6_dev_server"   in s.name), None)
+existing_w1    = next((s for s in existing if "group6_dev_worker_1" in s.name), None)
+existing_w2    = next((s for s in existing if "group6_dev_worker_2" in s.name), None)
 
-print ("Creating instances ... ")
-instance_prod = nova.servers.create(name="group6_prod_server_with_docker_"+str(identifier), image=image, flavor=flavor, key_name=None,userdata=userdata_prod, nics=nics,security_groups=secgroups)
-instance_dev = nova.servers.create(name="group6_dev_server_"+str(identifier), image=image, flavor=flavor, key_name=None,userdata=userdata_dev, nics=nics,security_groups=secgroups)
-inst_status_prod = instance_prod.status
-inst_status_dev = instance_dev.status
+# Create only the instances that are missing
+new_instances = []
+print("Creating missing instances...")
 
-print ("waiting for 10 seconds.. ")
-time.sleep(10)
+if existing_prod:
+    print(f"Skipping prod server — '{existing_prod.name}' already exists.")
+    instance_prod = existing_prod
+else:
+    instance_prod = nova.servers.create(name="group6_prod_server_with_docker_"+str(identifier), image=image, flavor=flavor, key_name=None, userdata=userdata_prod, nics=nics, security_groups=secgroups)
+    new_instances.append(instance_prod)
 
-while inst_status_prod == 'BUILD' or inst_status_dev == 'BUILD':
-    print ("Instance: "+instance_prod.name+" is in "+inst_status_prod+" state, sleeping for 5 seconds more...")
-    print ("Instance: "+instance_dev.name+" is in "+inst_status_dev+" state, sleeping for 5 seconds more...")
-    time.sleep(5)
-    instance_prod = nova.servers.get(instance_prod.id)
-    inst_status_prod = instance_prod.status
-    instance_dev = nova.servers.get(instance_dev.id)
-    inst_status_dev = instance_dev.status
+if existing_dev:
+    print(f"Skipping dev server — '{existing_dev.name}' already exists.")
+    instance_dev = existing_dev
+else:
+    instance_dev = nova.servers.create(name="group6_dev_server_"+str(identifier), image=image, flavor=flavor, key_name=None, userdata=userdata_dev, nics=nics, security_groups=secgroups)
+    new_instances.append(instance_dev)
 
-ip_address_prod = None
-for network in instance_prod.networks[private_net]:
-    if re.match('\d+\.\d+\.\d+\.\d+', network):
-        ip_address_prod = network
-        break
-if ip_address_prod is None:
-    raise RuntimeError('No IP address assigned!')
+if existing_w1:
+    print(f"Skipping dev worker 1 — '{existing_w1.name}' already exists.")
+    instance_worker1 = existing_w1
+else:
+    instance_worker1 = nova.servers.create(name="group6_dev_worker_1_"+str(identifier), image=image, flavor=flavor, key_name=None, userdata=userdata_worker1, nics=nics, security_groups=secgroups)
+    new_instances.append(instance_worker1)
 
-ip_address_dev = None
-for network in instance_dev.networks[private_net]:
-    if re.match('\d+\.\d+\.\d+\.\d+', network):
-        ip_address_dev = network
-        break
-if ip_address_dev is None:
-    raise RuntimeError('No IP address assigned!')
+if existing_w2:
+    print(f"Skipping dev worker 2 — '{existing_w2.name}' already exists.")
+    instance_worker2 = existing_w2
+else:
+    instance_worker2 = nova.servers.create(name="group6_dev_worker_2_"+str(identifier), image=image, flavor=flavor, key_name=None, userdata=userdata_worker2, nics=nics, security_groups=secgroups)
+    new_instances.append(instance_worker2)
 
-print ("Instance: "+ instance_prod.name +" is in " + inst_status_prod + " state" + " ip address: "+ ip_address_prod)
-print ("Instance: "+ instance_dev.name +" is in " + inst_status_dev + " state" + " ip address: "+ ip_address_dev)
+# Wait for newly created instances to finish building
+if new_instances:
+    print("waiting for 10 seconds...")
+    time.sleep(10)
+    building = list(new_instances)
+    while building:
+        still_building = []
+        for inst in building:
+            inst = nova.servers.get(inst.id)
+            if inst.status == 'BUILD':
+                print(f"Instance: {inst.name} is in BUILD state, sleeping for 5 seconds more...")
+                still_building.append(inst)
+            else:
+                print(f"Instance: {inst.name} is now {inst.status}")
+        if still_building:
+            time.sleep(5)
+        building = still_building
+
+# Refresh all instance objects to get final state and IPs
+instance_prod    = nova.servers.get(instance_prod.id)
+instance_dev     = nova.servers.get(instance_dev.id)
+instance_worker1 = nova.servers.get(instance_worker1.id)
+instance_worker2 = nova.servers.get(instance_worker2.id)
+
+ip_address_prod    = get_ip(instance_prod)
+ip_address_dev     = get_ip(instance_dev)
+ip_address_worker1 = get_ip(instance_worker1)
+ip_address_worker2 = get_ip(instance_worker2)
+
+print(f"Instance: {instance_prod.name} is in {instance_prod.status} state, ip address: {ip_address_prod}")
+print(f"Instance: {instance_dev.name} is in {instance_dev.status} state, ip address: {ip_address_dev}")
+print(f"Instance: {instance_worker1.name} is in {instance_worker1.status} state, ip address: {ip_address_worker1}")
+print(f"Instance: {instance_worker2.name} is in {instance_worker2.status} state, ip address: {ip_address_worker2}")
 
 # Automatically generate the Ansible hosts file with the fresh IPs
 hosts_content = f"""[prodserver]
@@ -105,6 +145,10 @@ prodserver_node ansible_host={ip_address_prod} ansible_user=appuser
 
 [devserver]
 devserver_node ansible_host={ip_address_dev} ansible_user=appuser
+
+[devworkers]
+devworker1_node ansible_host={ip_address_worker1} ansible_user=appuser
+devworker2_node ansible_host={ip_address_worker2} ansible_user=appuser
 """
 
 with open("hosts", "w") as f:
@@ -112,12 +156,13 @@ with open("hosts", "w") as f:
 
 print("Ansible hosts file updated automatically with new IPs!")
 
-# Update GitHub secret so Actions can SSH into the new prod server
-github_token = env.get('GITHUB_TOKEN')
-if github_token:
-    g = Github(github_token)
-    repo = g.get_repo("RobinMatter6/de2-project")
-    repo.create_secret("PROD_HOST", ip_address_prod)
-    print(f"GitHub secret PROD_HOST updated to {ip_address_prod}")
-else:
-    print(f"GITHUB_TOKEN not set. Please manually update GitHub secret PROD_HOST to {ip_address_prod}")
+# Update GitHub secret only if prod server was newly created
+if not existing_prod:
+    github_token = env.get('GITHUB_TOKEN')
+    if github_token:
+        g = Github(github_token)
+        repo = g.get_repo("RobinMatter6/de2-project")
+        repo.create_secret("PROD_HOST", ip_address_prod)
+        print(f"GitHub secret PROD_HOST updated to {ip_address_prod}")
+    else:
+        print(f"GITHUB_TOKEN not set. Please manually update GitHub secret PROD_HOST to {ip_address_prod}")
