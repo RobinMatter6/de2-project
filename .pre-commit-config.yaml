@@ -5,3 +5,13 @@ repos:
       - id: detect-secrets
         args: ['--baseline', '.secrets.baseline']
         exclude: '^\.secrets\.baseline$'
+
+  - repo: local
+    hooks:
+      - id: verify-author-name
+        name: Check for Author Name in Commit Message
+        stages: [commit-msg]
+        language: pygrep
+        entry: '(?i)(Aidan|Robin|Qinwu|John|Thomas|Fredrik)'
+        args: [--negate]
+        always_run: true

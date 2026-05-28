@@ -1,5 +1,9 @@
 [prodserver]
-prodserver_node ansible_host=192.168.2.129 ansible_user=appuser
+prodserver_node ansible_host=192.168.2.201 ansible_user=appuser
 
 [devserver]
-devserver_node ansible_host=192.168.2.92 ansible_user=appuser
+devserver_node ansible_host=192.168.2.234 ansible_user=appuser
+
+[devworkers]
+devworker1_node ansible_host=192.168.2.178 ansible_user=appuser
+devworker2_node ansible_host=192.168.2.206 ansible_user=appuser
