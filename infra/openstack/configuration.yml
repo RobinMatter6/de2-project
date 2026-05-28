@@ -126,7 +126,7 @@
 
    - name: Install ML packages
      become: true
-     pip: 
+     pip:
        executable: pip3
        name:
          - "torch"
@@ -135,3 +135,37 @@
          - "pandas"
          - "requests"
          - "pygithub"
+         - "ray[tune]"
+         - "tune-sklearn"
+
+   - name: Start Ray head node
+     become: false
+     shell: |
+       ray stop 2>/dev/null; nohup ray start --head --port=6379 --dashboard-host=0.0.0.0 > /tmp/ray_head_start.log 2>&1
+
+- hosts: devworkers
+
+  vars_files:
+   - setup_var.yml
+
+  tasks:
+   - name: Extra packages
+     apt: pkg=python3-pip state=latest update_cache=true
+     become: true
+
+   - name: Install Ray and ML packages
+     become: true
+     pip:
+       executable: pip3
+       name:
+         - "ray[tune]"
+         - "tune-sklearn"
+         - "scikit-learn"
+         - "numpy"
+         - "pandas"
+         - "joblib"
+
+   - name: Start Ray worker node
+     become: false
+     shell: |
+       ray stop 2>/dev/null; nohup ray start --address={{ hostvars['devserver_node']['ansible_host'] }}:6379 > /tmp/ray_worker_start.log 2>&1
