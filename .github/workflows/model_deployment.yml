@@ -10,10 +10,14 @@ jobs:
   deploy:
     runs-on: self-hosted
     steps:
+      - name: Read prod host from inventory
+        id: inventory
+        run: echo "prod_host=$(grep -A1 '^\[prodserver\]' /home/ubuntu/de2-project/infra/openstack/hosts | grep -oP 'ansible_host=\K[0-9.]+')" >> "$GITHUB_OUTPUT"
+
       - name: Deploy to prod server
         uses: appleboy/ssh-action@v1
         with:
-          host: ${{ secrets.PROD_HOST }}
+          host: ${{ steps.inventory.outputs.prod_host }}
           username: appuser
           key_path: /home/ubuntu/cluster-keys/cluster-key
           script: |

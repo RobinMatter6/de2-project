@@ -134,7 +134,6 @@
          - "numpy"
          - "pandas"
          - "requests"
-         - "pygithub"
          - "ray[tune]"
          - "tune-sklearn"
 

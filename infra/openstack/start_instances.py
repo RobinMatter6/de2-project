@@ -1,7 +1,6 @@
 # http://docs.openstack.org/developer/python-novaclient/ref/v2/servers.html
 import time, os, sys, random, re
 from os import environ as env
-from github import Github
 
 from  novaclient import client
 import keystoneclient.v3.client as ksclient
@@ -155,14 +154,3 @@ with open("hosts", "w") as f:
     f.write(hosts_content)
 
 print("Ansible hosts file updated automatically with new IPs!")
-
-# Update GitHub secret only if prod server was newly created
-if not existing_prod:
-    github_token = env.get('GITHUB_TOKEN')
-    if github_token:
-        g = Github(github_token)
-        repo = g.get_repo("RobinMatter6/de2-project")
-        repo.create_secret("PROD_HOST", ip_address_prod)
-        print(f"GitHub secret PROD_HOST updated to {ip_address_prod}")
-    else:
-        print(f"GITHUB_TOKEN not set. Please manually update GitHub secret PROD_HOST to {ip_address_prod}")
