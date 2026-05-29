@@ -35,14 +35,20 @@ To remove the runner, get the token by clicking remove runner at https://github.
 ./infra/actions_runner/teardown-runner.sh <REMOVAL_TOKEN>
 ```
 
-## Deploy to Production
-
-Train the model and commit the artifacts, then push main to the production branch to trigger the CI/CD pipeline:
+## Training the Model
 
 ```bash
 cd dev_server
 python3 train_final_model.py
-cd ..
+```
+
+This generates `star_predictor_model.pkl`, `top_languages.pkl`, and `model_columns.pkl`.
+
+## Deploy to Production
+
+Commit the trained model artifacts and push main to the production branch to trigger the CI/CD pipeline:
+
+```bash
 git add dev_server/star_predictor_model.pkl dev_server/top_languages.pkl dev_server/model_columns.pkl
 git commit -m "Push new model to production"
 git push origin main
